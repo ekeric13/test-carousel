@@ -108,7 +108,7 @@ class Carousel extends Component {
     return (
       <div className="carousel-container">
         <button className="carousel-nav carousel-left-nav"></button>
-        <div className="carousel"></div>
+        <div className="carousel-viewport"></div>
         <button className="carousel-nav carousel-right-nav"></button>
       </div>
     );
