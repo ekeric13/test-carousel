@@ -1,0 +1,70 @@
+.carousel-container {
+
+  display: flex;
+  position: relative;
+
+  /*temp so we can see better*/
+  /*border: 3px solid green;*/
+}
+
+.carousel-viewport {
+  white-space: nowrap;
+  overflow-y: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex-grow: 1;
+  border: 1px solid black;
+  position: relative;
+  z-index: 1;
+}
+
+.carousel-nav {
+  /*flex-basis: 35px;
+  flex-shrink: 0;*/
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 35px;
+  background-color: white;
+  padding: 0;
+  border: 1px solid black;
+  border-top-color: black;
+  border-bottom-color: black;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  opacity: .8;
+  transition: opacity .2s ease-in-out;
+  z-index: 3;
+}
+
+.carousel-nav:hover:not(.carousel-nav-disabled) {
+  opacity: .95;
+}
+
+.carousel-nav:focus:not(.carousel-nav-disabled) {
+  border: 1px solid blue;
+}
+
+.carousel-left-nav {
+  left: 0;
+  border-right-color: rgb(113, 113, 193);
+}
+
+.carousel-right-nav {
+  right: 0;
+  border-left-color: rgb(113, 113, 193);
+}
+
+.carousel-nav-disabled {
+  opacity: 0;
+  z-index: 0;
+  cursor: default;
+  transition: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.carousel-viewport::-webkit-scrollbar {
+  display: none;
+}

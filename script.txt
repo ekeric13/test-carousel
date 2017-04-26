@@ -1,0 +1,1708 @@
+in your terminal run `create-react-app carousel`
+
+go to public/index.html
+
+put title in "our carousel"
+
+we have character set tag and viewport tag
+
+possibly change port if you are using localhost 3000
+
+go to package.json and in scripts.start change it to
+
+`PORT=3006 react-scripts start`
+
+lets see what it looks like
+
+run `npm run start`
+
+look at the screen
+
+lets change the css.
+
+first add in normalize to conform to css standards
+
+1. npm install --save normalize.css
+
+2. import file in index.js `import normalize.css`;
+
+
+in index.css add in
+```
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+```
+
+
+then change the css in the body to some defaults and make our text look nicer
+```
+body {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 12px;
+  color: black;
+  background-color: white;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+```
+
+-look at the screen.
+
+
+then create carousel.js and carousel.css files
+
+```
+import React, {Component } from 'react';
+import './Carousel.css';
+
+class Carousel extends Component {
+  render() {
+    return (
+      <div className="carousel-container">hey</div>
+    );
+  }
+}
+
+export default Carousel;
+```
+
+replace carousel.js with app.js in index.js
+
+-take a look at the screen
+
+now lets center this a bit and not let it float in the middle of the screen. this has nothing to do with the carousel.
+just makes it easier to see it.
+
+in index.css we will add some styling to the root 
+
+
+```
+#root {
+
+  padding: 20px;
+
+  /*temp so we can see better*/
+  border: 1px solid black;
+}
+```
+
+in carousel.css we will style the container
+
+```
+.carousel-container {
+  /*temp so we can see better*/
+  border: 3px solid green;
+}
+```
+
+now that we can kind of see stuff, lets start building out our carousel
+
+we need our carousel buttons and a carousel viewport itself
+
+```
+class Carousel extends Component {
+  render() {
+    return (
+      <div className="carousel-container">
+        <button className="carousel-nav carousel-left-nav"></button>
+        <div className="carousel"></div>
+        <button className="carousel-nav carousel-right-nav"></button>
+      </div>
+    );
+  }
+}
+```
+
+-look at the screen. 
+it would help if we could see what would be in the carousel. lets add some dummy data
+
+google "states json". go to gist with json. get some json
+
+create a file named `data.json`. paste state json into it.
+
+in carousel.js import the json. can do this because wepback has json loader.
+
+```
+import data from './data.json';
+```
+
+now lets take a look at it
+
+```
+render() {
+    console.log('data', data);
+    return (
+      <div className="carousel-container">
+```
+
+it looks good. so now lets put it on the screen. each state will be a slide. and each slide will be a component
+
+```
+<div className="carousel">
+  {this.renderSlides()}
+</div>
+```
+
+```
+  renderSlides() {
+    return data.map((state)=>{
+      return (
+        <Slide 
+          name={state.name} 
+          key={state.abbreviation}
+        />
+      )
+    })
+  }
+```
+
+```
+import Slide from './Slide';
+import data from './data.json';
+```
+
+create a slide component and css
+
+```
+import React, { Component } from 'react';
+import './Slide.css';
+
+class Slide extends Component {
+  render() {
+    const {
+      name
+    } = this.props;
+    return (
+      <div className="slide">{name}</div>
+    );
+  }
+}
+
+export default Slide;
+```      
+
+-look at screen
+
+
+now we want our buttons to be next to our content, so lets give whatever wraps the buttons display:flex as we want them next to each other and the same height
+
+in carousel.css:
+
+```
+.carousel-container {
+
+  display: flex;
+
+  /*temp so we can see better*/
+  border: 1px solid green;
+}
+```
+
+lets add some css to each slide so it is easier to see. in slide.css
+
+```
+.slide {
+  /*temp border*/
+  border: 1px solid black;
+}
+```
+
+now lets get rid of the slides from stacking and put them next to each other. 
+so in the slide.css file give each of the slides a style of inline-block and align them to the top.
+
+-make change in console first
+
+```
+.slide {
+  display: inline-block;
+  vertical-align: top;
+  border-right: 1px solid black;
+}
+
+.slide:last-child {
+  border-right: none;
+}
+```
+
+now we only want one row in are carousel so lets change the viewport so none of the slides wrap.
+in carousel.css, modify the carousel viewport. white-space:no-wrap changes it so the slides are on one line.
+and overflow: auto will let you scroll
+
+-make change in console first
+
+```
+.carousel-viewport {
+  white-space: nowrap;
+  overflow-y: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid black;
+}
+
+.carousel-container {
+  // take off green border
+}
+```
+
+the scrollbar is very apparent. that is because we have no height.
+
+-make change in console first
+
+```
+.slide {
+  height: 50px;
+  width: 120px;
+  padding: 5px;
+}
+```
+
+-scroll 
+
+if you think the scrollbar still looks bad you can take it off like so. 
+
+```
+.carousel-viewport::-webkit-scrollbar {
+  display: none;
+}
+```
+
+i am going to keep the scrollbar there so it is easier to show what is happening.
+
+looks like micronesia is overflowing. it seems like white-space is getting inherited from the parent. 
+so lets change that back to normal
+
+```
+.slide {
+  white-space: normal;
+}
+```
+
+lets get the buttons to work.
+
+first we can put some arrows in there. and style it. 
+
+google unicode less than, unicode greater than
+
+```
+<button className="carousel-nav carousel-left-nav">&#60;</button>
+<div className="carousel-viewport">
+  {this.renderSlides()}
+</div>
+<button className="carousel-nav carousel-right-nav">&#62;</button>
+```
+
+add in classes to css
+
+```
+.carousel-nav {
+
+}
+
+.carousel-left-nav {
+
+}
+
+.carousel-right-nav {
+  
+}
+```
+
+-add this css in the console
+
+now lets style our carousel
+
+```
+.carousel-nav {
+  width: 35px;
+  cursor: pointer;
+  background-color: grey;
+  padding: 0;
+  border: 1px solid blue;
+}
+```
+
+it looks like our width is not working. this is probably because it is a flex child so flex is doing 
+weird things to fit all it's children in.
+
+-look at css computed flex-basis, flex-shrink
+
+flex-shrink is set to 1 by default so lets take that off.
+
+```
+.carousel-nav {
+  flex-basis: 35px;
+  flex-shrink: 0;
+  background-color: grey;
+  padding: 0;
+  font-size: 16px;
+  border: 1px solid blue;
+  cursor: pointer;
+}
+```
+
+-add styles to css file. save. make the window bigger and smaller
+
+it looks like it is working well but lets be explicity and give the carousel-viewport a flex-grow of 1.
+
+```
+.carousel-viewport {
+  flex-grow: 1;
+}
+```
+
+also some people don't like the outlines on the buttons when focused so we can make the border darker instead
+
+```
+.carousel-nav {
+  border: 1px solid blue;
+  outline: none;
+}
+
+.carousel-nav:focus {
+  border: 1px solid blue;
+}
+```
+
+lets also make the button darker when hovered
+```
+.carousel-nav {
+  opacity: .8;
+  transition: opacity .2s ease-in-out;
+}
+.carousel-nav:hover {
+  opacity: 1;
+}
+```
+
+okay lets now get the buttons to actually work.
+
+add in click handlers via react
+
+```
+<div className="carousel-container">
+  <button 
+    className="carousel-nav carousel-left-nav"
+    onClick={this.handleLeftNav}
+  >
+    &#60;
+  </button>
+```
+
+```
+handleLeftNav(e) {
+  console.log('left clicked');
+}
+```
+
+```
+constructor(props) {
+  super(props);
+  this.handleLeftNav = this.handleLeftNav.bind(this);
+}
+```
+
+be sure to add the constructor and bind it
+
+-test it out
+
+now lets do the right one. 
+
+```
+<button 
+  className="carousel-nav carousel-right-nav"
+  onClick={this.handleRightNav}
+>
+  &#62;
+</button>
+```
+
+```
+handleRightNav = (e) => {
+  console.log('right clicked');
+}
+```
+
+if you have a certain babel plugin, something like class properties transform, it lets you use
+class methods that bind functions to that class, getting rid of the bind boiler plate.
+
+
+-test it out again
+
+now lets get the carousel to move when clicked. we need to do this by moving our viewport.
+
+-in console select the carousel-viewport div. then change it's scrollLeft to 50
+
+`$0.scrollLeft = 50;`
+`$0.scrollLeft = 100;`
+
+we can move our viewport by changing the scrollLeft property. you are probably familiar with scrollTop,
+as scrollTop is used to scroll from one section to the next on landing pages often.
+scrollLeft is the same thing but to the left.
+
+lets have variables define the width to scroll, and the number of slides to scroll.
+we could use javascript to get the width of the slide but lets just hardcode it for now.
+
+```
+handleRightNav = (e) => {
+  console.log('right clicked');
+  const { carouselViewport } = this.refs;
+  var numOfSlidesToScroll = 1.5;
+  var widthOfSlide = 120;
+  carouselViewport.scrollLeft = numOfSlidesToScroll * widthOfSlide;
+}
+```
+
+-test it out
+
+it worked the first time. but the second time it doesn't move since we need to add the new scrollLeft to the old one.
+lets do that now.
+
+
+handleRightNav = (e) => {
+  const { carouselViewport } = this.refs;
+  var numOfSlidesToScroll = 1.5;
+  var widthOfSlide = 120;
+  var newPos = carouselViewport.scrollLeft + (numOfSlidesToScroll * widthOfSlide);
+  carouselViewport.scrollLeft = newPos;
+  console.log('right clicked', newPos);
+}
+
+
+-test it out.
+
+okay, it's moving alright. but it is just jumping from one position to the next. we need an easing function
+that interpolates one position to the next over a defined period of time. we can right that ourselves or we can just find a function that does that on stackoverflow.
+
+http://stackoverflow.com/a/16136789/4100465
+
+create a scrollToAnimateFile, paste it in.
+
+```
+function scrollTo(element, to, duration) {
+    var start = element.scrollTop,
+        change = to - start,
+        increment = 20;
+
+    var animateScroll = function(elapsedTime) {        
+        elapsedTime += increment;
+        var position = easeInOut(elapsedTime, start, change, duration);                        
+        element.scrollTop = position; 
+        if (elapsedTime < duration) {
+            setTimeout(function() {
+                animateScroll(elapsedTime);
+            }, increment);
+        }
+    };
+
+    animateScroll(0);
+}
+
+function easeInOut(currentTime, start, change, duration) {
+    currentTime /= duration / 2;
+    if (currentTime < 1) {
+        return change / 2 * currentTime * currentTime + start;
+    }
+    currentTime -= 1;
+    return -change / 2 * (currentTime * (currentTime - 2) - 1) + start;
+}
+
+export default scrollTo;
+```
+
+this function takes the viewport element, position we want to scroll to, and how long to scroll.
+instead of moving to the position all at once, it breaks down the length of movement into chunks, 
+and recursively calls a setTimeout to move a bit at a time until how long to scroll is up.
+it uses an easing function so it moves slower at the beginning and end of the duration.
+
+it's always good to read the code from Stackoverflow and not blindly copy and paste. 
+notice how it only works for scrollTop. lets change it so that it works for a specific direction
+
+```
+function scrollTo(element, to, duration, scrollDirection) {
+    var start = element[scrollDirection],
+        change = to - start,
+        increment = 20;
+
+    var animateScroll = function(elapsedTime) {        
+        elapsedTime += increment;
+        var position = easeInOut(elapsedTime, start, change, duration);                        
+        element[scrollDirection] = position;
+        if (elapsedTime < duration) {
+            setTimeout(function() {
+                animateScroll(elapsedTime);
+            }, increment);
+        }
+    };
+
+    animateScroll(0);
+}
+```
+
+lets try this out now by using it in our react componenet
+
+```
+handleRightNav = (e) => {
+  const { carouselViewport } = this.refs;
+  var numOfSlidesToScroll = 3.5;
+  var widthOfSlide = 120;
+  var newPos = carouselViewport.scrollLeft + (numOfSlidesToScroll * widthOfSlide);
+  var timeToMoveOneSlide = 200;
+  var totalTimeToMove = (numOfSlidesToScroll * timeToMoveOneSlide);
+  // carouselViewport.scrollLeft = newPos;
+  console.log('right clicked', newPos);
+  scrollTo(carouselViewport, newPos, totalTimeToMove, 'scrollLeft');
+}
+```
+
+-try it out
+
+this looks way to slow. lets limit how long it can scroll to 400ms
+
+```
+var totalTimeToMove = Math.min( (numOfSlidesToScroll * timeToMoveOneSlide), 400);
+```
+
+lets say we want to scroll our full carousel viewport
+lets get the width of the viewport.
+
+- go to console. $0.offsetWidth
+
+usually our options are clientWidth and offsetWidth (scrollWidth is the width of all the slides).
+Lets use offsetWidth since it takes into account borders and 
+i have been burned by clientWidth because of that before.
+
+```
+var widthOfSlide = 120;
+// var newPos = carouselViewport.scrollLeft + (numOfSlidesToScroll * widthOfSlide);
+var newPos = carouselViewport.scrollLeft + carouselViewport.offsetWidth;
+var timeToMoveOneSlide = 200;
+```
+
+-try it out.
+
+awesome! i am going to change it back to our defined variables for now though.
+
+```
+var newPos = carouselViewport.scrollLeft + (numOfSlidesToScroll * widthOfSlide);
+// var newPos = carouselViewport.scrollLeft + carouselViewport.offsetWidth;
+var timeToMoveOneSlide = 200;
+```
+
+lets take a look at that scrollTo function and clean it up a bit.
+
+if you aren't supporting ie9 anymore then you might want to use requestAnimationFrame instead
+the recursive setTimeout as Paul Irish tells us to.
+
+so take out `animateScroll(0);`
+and replace with 
+`window.requestAnimationFrame(animateScroll.bind(null,0));`
+we have to pass in the arguement via bind as there is a default argument given to 
+requestAnimationFrame.
+
+now replace the setTimeout with a requestAnimationFrame
+
+```
+if (elapsedTime < duration) {
+  window.requestAnimationFrame(animateScroll.bind(null, elapsedTime));
+}
+```
+
+-test to see if it still works
+
+our scrollTo function takes 4 arguments which is a lot and can be confusing when
+trying to remember what to pass to it. let's pass in params instead.
+
+in scrollToAnimate file
+
+```
+function scrollTo(params) {
+  const {
+    element,
+    to,
+    duration,
+    scrollDirection
+  } = params;
+```
+
+in carousel.js file
+
+```
+scrollTo({
+  element: carouselViewport, 
+  to: newPos, 
+  duration: totalTimeToMove, 
+  scrollDirection: 'scrollLeft'
+});
+```
+
+-test to see if it still works
+
+okay now lets get the left arrow button working. it should be the same thing except 
+now we subtract how much we move in the viewport from the original position
+
+```
+handleLeftNav(e) {
+  const { carouselViewport } = this.refs;
+  var numOfSlidesToScroll = 3.5;
+  var widthOfSlide = 120;
+  var newPos = carouselViewport.scrollLeft - (numOfSlidesToScroll * widthOfSlide);
+  
+  var timeToMoveOneSlide = 200;
+  var totalTimeToMove = Math.min( (numOfSlidesToScroll * timeToMoveOneSlide), 400);
+  console.log('left clicked', newPos);
+  scrollTo({
+    element: carouselViewport, 
+    to: newPos, 
+    duration: totalTimeToMove, 
+    scrollDirection: 'scrollLeft'
+  });
+}
+```
+
+
+lets say we want to change the number of slides to scroll if the window is smaller
+
+first we should abstract that into our local state
+
+```
+constructor(props) {
+  super(props);
+  this.handleLeftNav = this.handleLeftNav.bind(this);
+
+  this.state = {
+    numOfSlidesToScroll: 4
+  }
+}
+```
+
+```
+handleLeftNav(e) {
+  const { carouselViewport } = this.refs;
+  var numOfSlidesToScroll = this.state.numOfSlidesToScroll;
+```
+
+```
+handleRightNav = (e) => {
+  const { carouselViewport } = this.refs;
+  var numOfSlidesToScroll = this.state.numOfSlidesToScroll;
+```
+
+now we want to change that state if the window size has changed. so lets add a resize handler.
+we will add it after the component mounts, and remove it when the component will unmount.
+
+you can play around with the logic dealing with number of slides to scroll.
+and i am not going to change the state unless the number has changed since
+I don't want any additonal, wasteful renders.
+
+```
+constructor(props) {
+  super(props);
+  this.handleLeftNav = this.handleLeftNav.bind(this);
+  this.onResize = this.onResize.bind(this);
+
+
+componentDidMount() {
+  this.checkNumOfSlidesToScroll();
+  window.addEventListener('resize', this.onResize);
+}
+
+componentWillUnmount() {
+  window.removeEventListener('resize', this.onResize);
+}
+
+onResize(e) {
+  this.checkNumOfSlidesToScroll();
+}
+
+checkNumOfSlidesToScroll() {
+  var numOfSlidesToScroll;
+  if ( window.innerWidth <= 900 ) {      
+    numOfSlidesToScroll = 2;
+  } else {
+    numOfSlidesToScroll = 4;
+  }
+  if ( this.state.numOfSlidesToScroll !== numOfSlidesToScroll) {
+    console.log('in here', numOfSlidesToScroll);
+    this.setState({numOfSlidesToScroll: numOfSlidesToScroll});
+  }
+}
+```
+
+-test to make sure it works
+
+we could actually even do something like have a hardcoded keyword to scroll offsetWidth
+
+```
+checkNumOfSlidesToScroll() {
+  console.log('checking', performance.now());
+  var numOfSlidesToScroll;
+  if ( window.innerWidth <= 900 ) {      
+    numOfSlidesToScroll = 'full';
+  } else {
+```
+
+
+```
+widthAndTimeToScroll() {
+  const { carouselViewport } = this.refs;
+  var numOfSlidesToScroll = this.state.numOfSlidesToScroll;
+  if ( numOfSlidesToScroll === 'full') {
+    return {
+      widthToScroll: carouselViewport.offsetWidth,
+      timeToScroll: 400
+    };
+  } else {
+
+    var widthOfSlide = 120;
+    var timeToMoveOneSlide = 200;
+    return {
+      widthToScroll: numOfSlidesToScroll * widthOfSlide,
+      timeToScroll: Math.min( (numOfSlidesToScroll * timeToMoveOneSlide), 400)
+    }
+  }
+}
+
+handleLeftNav(e) {
+  const { carouselViewport } = this.refs;
+  var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+  var newPos = carouselViewport.scrollLeft - widthToScroll;
+
+     console.log('left clicked', newPos);
+  scrollTo({
+    element: carouselViewport, 
+    to: newPos, 
+    duration: timeToScroll, 
+    scrollDirection: 'scrollLeft'
+  });
+}
+
+handleRightNav = (e) => {
+  const { carouselViewport } = this.refs;
+  var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+  var newPos = carouselViewport.scrollLeft + widthToScroll;
+  console.log('right clicked', newPos);
+  scrollTo({
+    element: carouselViewport, 
+    to: newPos, 
+    duration: timeToScroll, 
+    scrollDirection: 'scrollLeft'
+  });
+}
+```
+
+-test to make sure it works.
+
+one thing to notice is how many times we are calling the resize. we should definitely throttle
+our resizing so the browser isn't wasting resources.
+we want to use throttle and not debounce since debounce is only called after the event is 
+completely done streaming.
+throttle, "throttles" events that are getting continuously called.
+
+in our terminal run the command
+`npm install lodash.throttle --save`
+
+and import it and throttle the resize function
+
+```
+import scrollTo from './scrollToAnimate';
+
+import throttle from 'lodash.throttle';
+```
+
+```
+constructor(props) {
+  super(props);
+  this.handleLeftNav = this.handleLeftNav.bind(this);
+  this.onResize = this.onResize.bind(this);
+  this.throttleResize = throttle(this.onResize, 250);
+```
+
+```
+componentDidMount() {
+  this.checkNumOfSlidesToScroll();
+  window.addEventListener('resize', this.throttleResize);
+}
+
+componentWillUnmount() {
+  window.removeEventListener('resize', this.throttleResize);
+}
+```
+
+-test out to see if checking is called less
+
+
+screen real estate is pretty important, so lets say we want our carousel to be partly behind the buttons
+
+we will first need to position our buttons absolute and on top of the carousel viewport
+
+-do this in console at first
+
+```
+.carousel-nav {
+  position: absolute;
+  top: 0;
+}
+
+.carousel-container {
+  poisition: relative;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 35px;
+  border: 1px solid rgb(113, 113, 193);
+}
+
+.carousel-nav-left {
+  left: 0
+}
+
+.carousel-nav-right {
+  right: 0;
+}
+
+```
+
+-now do this in text editor
+
+we need to give our carousel viewport a defined position, 
+or else z-index is ignored.
+
+```
+.carousel-nav {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 35px;
+  border: 1px solid black;
+  // get rid of flex stuff
+  z-index: 3;
+}
+
+.carousel-nav-left {
+  left: 0;
+  border-right-color: rgb(113, 113, 193);
+}
+
+.carousel-nav-right {
+  right: 0;
+  border-left-color: rgb(113, 113, 193);
+}
+
+.carousel-container {
+  poisition: relative;
+}
+
+.carousel-viewport {
+  position: relative;
+  z-index: 1;
+}
+```
+
+-test it out
+
+
+we can see that the buttons are covering our carousel even when we cannot go further left.
+lets hide that button depending on if the carousel is scrolled.
+
+we need to import the react library classnames
+
+`npm install classnames --save`
+
+```
+import throttle from 'lodash.throttle';
+import classNames from 'classnames';
+```
+
+and we need something in our local state to disable a button if we haven't scrolled
+
+```
+constructor(props) {
+  this.state = {
+    allTheWayLeft: false,
+    allTheWayRight: false,
+    numOfSlidesToScroll: 4
+  }
+```
+
+and we need to conditionally add classes given our state
+
+```
+const {
+  allTheWayLeft,
+  allTheWayRight
+} = this.state;
+const defaultNavClasses = classNames({
+  'carousel-nav': true
+})
+
+const leftNavClasses = classNames({
+  'carousel-left-nav': true,
+  'carousel-nav-disabled': allTheWayLeft
+}, defaultNavClasses);
+
+const rightNavClasses = classNames({
+  'carousel-right-nav': true,
+  'carousel-nav-disabled': allTheWayRight
+}, defaultNavClasses)
+return (
+  <div className="carousel-container">
+    <button 
+      className={leftNavClasses}
+      onClick={this.handleLeftNav}
+    >
+    ...
+    <button 
+      className={rightNavClasses}
+      onClick={this.handleRightNav}
+    >
+```
+
+```
+.carousel-nav-disabled {
+  opacity: 0;
+  z-index: 0;
+  cursor: default;
+  user-select: none;
+  pointer-events: none;
+}
+```
+
+okay now we need to set when those conditions are true
+
+```
+componentDidMount() {
+  this.checkNumOfSlidesToScroll();
+  this.checkIfAllTheWayOver();
+...
+checkIfAllTheWayOver() {
+  const { carouselViewport } = this.refs;
+  // if scroll left === 0 
+    // do not show button
+}
+```
+
+now lets implement the logic
+
+```
+checkIfAllTheWayOver() {
+  const { carouselViewport } = this.refs;
+  // if scroll left === 0 
+    // do not show button
+  var allTheWayLeft = false;
+  if ( carouselViewport.scrollLeft === 0 ) {
+    allTheWayLeft = true;
+  }
+
+  if ( this.state.allTheWayLeft !== allTheWayLeft ) {
+    this.setState({
+      allTheWayLeft
+    })
+  }
+  
+}
+```
+
+-check to see if it works. scroll now.
+
+that seems right but now we need that function to be called after scroll
+
+add an event listener to our carousel viewport since that is being scrolled
+
+```
+<div className="carousel-viewport" ref="carouselViewport" onScroll={this.throttleScroll}>
+  {this.renderSlides()}
+</div>
+```
+
+```
+constructor(props) {
+  super(props);
+  this.handleLeftNav = this.handleLeftNav.bind(this);
+  this.onResize = this.onResize.bind(this);
+  this.throttleResize = throttle(this.onResize, 250);
+  this.throttleScroll = throttle(this.onScroll, 250);
+```
+
+```
+onScroll = (e) => {
+  console.log('scrolling');
+  this.checkIfAllTheWayOver();
+}
+```
+
+-test it out
+
+awesome, it is appearing again once we scroll.
+but on the initial mount you can see the arrow briefly. lets quickly take that out.
+
+```
+.carousel-nav-disabled {
+  opacity: 0;
+  z-index: 0;
+  cursor: default;
+  transition: none;
+}
+```
+
+-test it out
+
+okay, now we need to hammer out the logic for if it is all the way to the right.
+
+```
+// if scrollLeft + length of viewport === real width of carousel
+  // do not show right
+```
+
+lets be sure to log what the widths are
+
+```
+var allTheWayRight = false;
+
+var totalWidthOfCarousel = carouselViewport.scrollWidth;
+var amountScolled = carouselViewport.scrollLeft;
+var viewportLength = carouselViewport.offsetWidth;
+
+console.log('what are these', totalWidthOfCarousel, amountScolled + viewportLength,  amountScolled, viewportLength)
+
+if ( amountScolled + viewportLength === totalWidthOfCarousel ) {
+  allTheWayRight = true;
+}
+
+
+if ( this.state.allTheWayLeft !== allTheWayLeft || this.state.allTheWayRight !== allTheWayRight ) {
+  this.setState({
+    allTheWayLeft,
+    allTheWayRight
+  })
+}
+```
+
+-test it out
+
+it looks like we are over by 2px 7080 vs 7082.
+this is probably because we have a border on the viewport. adding 2px to left and right.
+i mentioned the offsetWidth vs clientWidth earlier. Let's try clientWidth as it 
+does not take into account the borders.
+
+` var viewportLength = carouselViewport.clientWidth;`
+
+-test it out
+
+that seems to be work but browser calculations can be iffy and vary across browser. 
+so you might want to add a cushion that hides the button if it is plus or minus 5px from
+the scrollWidth
+
+one gotcha is pressing the button and then having the carousel scroll all the way over
+
+-press left nav button to show example
+
+we need to call our "checkAllTheWayOver" function after the viewport is done moving.
+
+```
+handleLeftNav(e) {
+  const { carouselViewport } = this.refs;
+  var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+  var newPos = carouselViewport.scrollLeft - widthToScroll;
+
+     console.log('left clicked', newPos);
+  scrollTo({
+    element: carouselViewport, 
+    to: newPos, 
+    duration: timeToScroll, 
+    scrollDirection: 'scrollLeft',
+    callback: this.checkIfAllTheWayOver
+  });
+}
+```
+
+```
+function scrollTo(params) {
+  const {
+    element,
+    to,
+    duration,
+    scrollDirection,
+    callback
+  } = params;
+...
+if (elapsedTime < duration) {
+  animId = window.requestAnimationFrame(animateScroll.bind(null, elapsedTime));
+} else {
+  console.log('FINISHED');
+  if (typeof callback == 'function') { 
+    callback(); 
+  }
+}
+```
+
+-try the button again and watch it fail.
+
+it looks like it doesn't know what refs are. so lets pass the context in and invoke it using 
+that context
+
+```
+handleLeftNav(e) {
+  const { carouselViewport } = this.refs;
+  var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+  var newPos = carouselViewport.scrollLeft - widthToScroll;
+
+     console.log('left clicked', newPos);
+  scrollTo({
+    element: carouselViewport, 
+    to: newPos, 
+    duration: timeToScroll, 
+    scrollDirection: 'scrollLeft',
+    callback: this.checkIfAllTheWayOver,
+    context: this
+  });
+}
+
+handleRightNav = (e) => {
+...
+  scrollTo({
+    element: carouselViewport, 
+    to: newPos, 
+    duration: timeToScroll, 
+    scrollDirection: 'scrollLeft',
+    callback: this.checkIfAllTheWayOver,
+    context: this
+  });
+```
+
+```
+if (typeof callback == 'function') { 
+  callback.call(context); 
+}
+```
+
+-test it out and see it fail still.
+
+it looks like it is still there. the javascript seems solid so lets look at the css
+
+-have elements tab open when click button
+
+looks like we have a specificity issue. the hover and focus take precedencer over a normal class.
+
+we could add another class to increase the specificity
+
+```
+.carousel-container .carousel-nav-disabled 
+```
+
+-test it out and see it work
+
+but those classes shouldn't even be applied when the carousel is disabled. 
+explicit css is better than implicit.
+
+```
+.carousel-nav:hover:not(.carousel-nav-disabled) {
+  opacity: .95;
+}
+
+.carousel-nav:focus:not(.carousel-nav-disabled) {
+  border: 1px solid blue;
+}
+```
+
+-test it out
+
+that looks great. now one thing we can add is keyboard interaction
+
+```
+componentDidMount() {
+  this.checkNumOfSlidesToScroll();
+  this.checkIfAllTheWayOver();
+  window.addEventListener('resize', this.throttleResize);
+  window.addEventListener('keydown', this.whatKey);
+}
+
+componentWillUnmount() {
+  window.removeEventListener('resize', this.throttleResize);
+  window.removeEventListener('keydown', this.whatKey);
+}
+
+whatKey = (e) => {
+  console.log(e.keyCode);
+  var leftArrow = e.keyCode === 37;
+  var rightArrow = e.keyCode === 39;
+  if ( leftArrow ) {
+    this.handleLeftNav();
+  }
+  if ( rightArrow ) {
+    this.handleRightNav();
+  }
+}
+```
+
+-test it out. see it is a little bit weird when holding the arrow key. especially on screens shorter
+than 900px
+
+we should not let the carousel scroll until one complete scroll is done. so to wait for the scrollTo
+function to finish we can simply.
+
+```
+function scrollTo(params) {
+  // right here
+  return new Promise((res,rej)=>{
+    const {
+      element,
+      to,
+      duration,
+      scrollDirection,
+      callback,
+      context
+    } = params;
+    var start = element[scrollDirection],
+        change = to - start,
+        increment = 20;
+
+    var animateScroll = function(elapsedTime) {        
+        elapsedTime += increment;
+        var position = easeInOut(elapsedTime, start, change, duration);                        
+        element[scrollDirection] = position;
+        if (elapsedTime < duration) {
+          window.requestAnimationFrame(animateScroll.bind(null, elapsedTime));
+        } else {
+          console.log('FINISHED');
+          if (typeof callback == 'function') { 
+            callback.call(context); 
+          }
+          // right here
+          res();
+        }
+    };
+
+    window.requestAnimationFrame(animateScroll.bind(null,0));
+  // right here 
+  })
+}
+```
+
+we then return that promise so we know when the scrollTo function is done
+
+```
+handleLeftNav(e) {
+  const { carouselViewport } = this.refs;
+  var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+  var newPos = carouselViewport.scrollLeft - widthToScroll;
+
+     // console.log('left clicked', newPos);
+  // if ( this.promise) {
+  //   console.log('')
+  // }
+  var promise = scrollTo({
+    element: carouselViewport, 
+    to: newPos, 
+    duration: timeToScroll, 
+    scrollDirection: 'scrollLeft',
+    callback: this.checkIfAllTheWayOver,
+    context: this
+  })
+  return promise;
+}
+
+handleRightNav = (e) => {
+  const { carouselViewport } = this.refs;
+  var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+  var newPos = carouselViewport.scrollLeft + widthToScroll;
+  // console.log('right clicked', newPos);
+  return scrollTo({
+    element: carouselViewport, 
+    to: newPos, 
+    duration: timeToScroll, 
+    scrollDirection: 'scrollLeft',
+    callback: this.checkIfAllTheWayOver,
+    context: this
+  });
+}
+```
+
+we then use this information to stop handleLeft from getting called
+
+```
+whatKey = (e) => {
+  console.log(e.keyCode);
+  var leftArrow = e.keyCode === 37;
+  var rightArrow = e.keyCode === 39;
+  if ( leftArrow ) {
+    this.handleLeftNav().then(()=>{
+      this.inProgressLeft = false;
+    });
+```
+
+we can set up a quick boolean logic to have handleLeft not get called
+
+```
+whatKey = (e) => {
+  console.log(e.keyCode);
+  var leftArrow = e.keyCode === 37;
+  var rightArrow = e.keyCode === 39;
+  if ( leftArrow ) {
+    if ( !this.animatingLeft ) {
+
+      this.handleLeftNav().then(()=>{
+        console.log('what is promise value here', promiseValue);
+        this.animatingLeft = false;
+      });
+    }
+```
+
+```
+if ( !this.animatingLeft ) {
+  this.animatingLeft = true;
+  this.handleLeftNav().then(()=>{
+    console.log('what is promise value here', promiseValue);
+    this.animatingLeft = false;
+  });
+}
+```
+
+```
+this.state = {
+  allTheWayLeft: false,
+  allTheWayRight: false,
+  numOfSlidesToScroll: 4
+}
+this.animatingLeft = false;
+```
+
+
+-test it out. see that it works. but see that we are logging when we are all the way over
+
+it works well but we are still logging when holding left, lets fix that by checking if 
+we are all the way over
+
+```
+whatKey = (e) => {
+  console.log(e.keyCode);
+  var leftArrow = e.keyCode === 37;
+  var rightArrow = e.keyCode === 39;
+  if ( leftArrow && !this.state.allTheWayLeft ) {
+```
+
+-test out to show logging stopped.
+
+okay now i will just implement this for the right arrow
+
+```
+whatKey = (e) => {
+...
+  if ( rightArrow && !this.state.allTheWayRight ) {
+    if ( !this.animatingRight ) {        
+      this.animatingRight = true;
+      this.handleRightNav().then(()=>{
+        this.animatingRight = false;
+      });
+    }
+  }
+```
+
+```
+constructor(props) {
+  this.animatingLeft = false;
+  this.animatingRight = false;
+```
+
+```
+handleRightNav = (e) => {
+  const { carouselViewport } = this.refs;
+  var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+  var newPos = carouselViewport.scrollLeft + widthToScroll;
+  // console.log('right clicked', newPos);
+  return scrollTo({
+```
+
+
+-test it out to see it work.
+
+the slide is fully responsive.
+we can dynamically change the width of the slide and it will work fine
+
+in slide.css
+
+```
+@media (min-width: 1000px) {
+  .slide {
+
+    width: 100px;
+  }
+}
+```
+
+so now if we have a window width above 1000px our slides will be 100px. we need
+to change the corresponding javascript for this.
+the best way to get the width of the dom node is probably to just use document.querySelector
+
+```
+widthAndTimeToScroll() {
+...
+  var widthOfSlide = document.querySelector('.slide').offsetWidth;
+```
+
+but i will show you the react way.
+
+though we are in a loop we just need one of the dom nodes
+
+```
+renderSlides() {
+...
+<Slide 
+  name={state.name} 
+  key={state.abbreviation}
+  ref={compSlide=> this.slide = compSlide}
+/>
+```
+
+once we have a ref for that component we need to access its dom, so we need to import
+
+```
+import React, {Component } from 'react';
+import { findDOMNode } from 'react-dom';
+import './Carousel.css';
+```
+
+and then we can use that to get the dom offsetWidth
+
+```
+widthAndTimeToScroll() {
+...
+  var widthOfSlide = findDOMNode(this.slide).offsetWidth;
+```
+
+-test out to see that it works
+
+now lets test it out on safari
+
+-see color disappears when clicking.
+
+lets investigate this further
+
+-set button as active. go to computed. see color is white. click on it. see it is activebuttontext.
+
+looks like we have a bad default. lets change it so buttons inherit from their parent
+
+go to index.css
+
+```
+button {
+  color: inherit;
+}
+```
+
+-test out again and see it works
+
+
+now we can try and do something more challenging. we can try nad have the carousel
+get dragged.
+
+to do this we need to take the scrollbar off as it will interfering with the dragging.
+
+in carousel.css
+
+```
+.carousel-viewport::-webkit-scrollbar {
+  display: none;
+}
+```
+
+also we need to make sure we don't drag our slides
+
+in slide.js
+
+```
+return (
+  <div className="slide" draggable={false}>
+```
+
+now lets set up our listeners
+
+so we are listening for when to start moving on click, 
+moving the mouse around and the carousel along with the mouse,
+and then stop moving the carousel when the user leaves the carousel or
+when they release the click
+
+```
+<div 
+  className="carousel-viewport" 
+  ref="carouselViewport" 
+  onScroll={this.throttleScroll}
+  onMouseDown={this.startMoving}
+  onMouseUp={this.stopMoving}
+  onMouseMove={this.moving}
+  onMouseLeave={this.stopMoving}
+  >
+```
+
+```
+startMoving = (e) => {
+  console.log('start e', e);
+  this.draggingCarousel = true;
+}
+```
+
+we should initialize the draggingCarousel variable
+
+```
+constructor(props) {
+...
+this.animatingRight = false;
+this.draggingCarousel = false;
+```
+
+we need to keep track of the x position of the mouse
+
+```
+startMoving = (e) => {
+  console.log('start e', e);
+  this.draggingCarousel = true;
+  this.lastX = e.clientX;
+}
+
+stopMoving = (e) => {
+  console.log('stop e', e);
+
+  this.draggingCarousel = false;
+  this.lastX = null
+}
+
+moving = (e) => {
+  if ( this.draggingCarousel ) {
+    console.log('move event', e, e.clientX);
+    var currentX = this.lastX - e.clientX;
+    var carouselViewport = this.refs.carouselViewport;
+    carouselViewport.scrollLeft = carouselViewport.scrollLeft + currentX;
+    this.lastX = e.clientX;
+  }
+}
+```
+
+we are continuously setting the lastX variable to the latest mouse position,
+and using the previous mouse position and the current mouse position find the offset
+and set the carousel to that offset
+
+
+-test it out. 
+
+alright that looks good but doesn't feel right. probably because after we 
+release the mouse it just stops.
+
+lets fix that by keep track of our original position and scrolling to the latest
+offset after the user stops moving the mouse.
+
+```
+stopMoving = (e) => {
+  console.log('stop e', e);
+  console.log('how far moved', this.initialX - this.lastX);
+  if ( this.draggingCarousel ) {
+    // amount scrolled 
+    // total width to move - the amount already scrolled = amountLeftOver
+    var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+    var carouselViewport = this.refs.carouselViewport;
+    var newPos = carouselViewport.scrollLeft + amountLeftOver;
+    scrollTo({
+      element: carouselViewport, 
+      to: newPos, 
+      duration: timeToScroll, 
+      scrollDirection: 'scrollLeft',
+      callback: this.checkIfAllTheWayOver,
+      context: this
+    });
+```
+
+so lets keep track of the inital position of the mouse
+
+```
+startMoving = (e) => {
+  console.log('start e', e);
+  this.draggingCarousel = true;
+  this.lastX, this.initialX = e.clientX;
+}
+```
+
+
+now using that we can compute total amount scrolled and how far to scroll afterwards.
+if we scrolled a positive number, scroll in a positive direction
+we want to know how much left over we have to scroll from whatever the closest cutoff is
+so `amountScolled % widthToScroll`
+and then subtract that from the width we need to scroll
+
+
+```
+stopMoving = (e) => {
+  if ( this.draggingCarousel && this.lastX ) {   
+    // amount scrolled    
+    var amountScolled = this.initialX - this.lastX;
+
+    var carouselViewport = this.refs.carouselViewport;
+    var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
+
+
+    // total width to move - the amount already scrolled = amountLeftOver
+    var amountLeftOver;
+    if ( amountScolled > 0 ) {
+      amountLeftOver = widthToScroll - ( amountScolled % widthToScroll );
+    } else {
+      amountLeftOver = -(widthToScroll - ( amountScolled % widthToScroll ));
+    }
+
+    console.log('the amount went over', amountScolled, amountLeftOver, widthToScroll);
+
+    var newPos = carouselViewport.scrollLeft + amountLeftOver;
+    var newTimeToScroll = fractionLeftToScroll * timeToScroll;
+
+    scrollTo({
+      element: carouselViewport, 
+      to: newPos, 
+      duration: timeToScroll, 
+      scrollDirection: 'scrollLeft',
+      callback: this.checkIfAllTheWayOver,
+      context: this
+    });
+  }
+
+
+  this.draggingCarousel = false;
+  this.lastX, this.initialX = null
+}
+```
+
+-test this out. see it works well going forward and back. but it fails when
+going forward and then back a little.
+
+it looks like we really want the last direction we are heading in.
+
+the currentX variable is the latest offset
+
+```
+moving = (e) => {
+...
+  this.lastX = e.clientX;
+  this.lastDirection = currentX;
+```
+
+now use that for the conditional
+
+```
+stopMoving = (e) => {
+...
+  var amountLeftOver;
+  if ( this.lastDirection >= 0 ) {
+    amountLeftOver = widthToScroll - ( amountScolled % widthToScroll );
+  } else {
+    amountLeftOver = -(widthToScroll - ( amountScolled % widthToScroll ));
+  }
+```
+
+-test it out. try going forward and then back.
+
+we won't add touch events for mobile as the user will be able to scroll
+just fine
+
+so now we have a pretty nice carousel. you can pick and choose what features to implement.
+i am going to put the code up on github
