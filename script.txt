@@ -10,7 +10,7 @@ possibly change port if you are using localhost 3000
 
 go to package.json and in scripts.start change it to
 
-`PORT=3006 react-scripts start`
+`PORT=3001 react-scripts start`
 
 lets see what it looks like
 

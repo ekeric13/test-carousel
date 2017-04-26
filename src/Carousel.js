@@ -198,20 +198,15 @@ class Carousel extends Component {
     console.log('how far moved', this.initialX - this.lastX);
     if ( this.draggingCarousel && this.lastX ) {      
       var amountScolled = this.initialX - this.lastX;
-      this.draggingCarousel = false;
-      this.lastX, this.initialX = null
-
       var carouselViewport = this.refs.carouselViewport;
 
       var {widthToScroll, timeToScroll} = this.widthAndTimeToScroll();
 
       var amountLeftOver;
-      if ( this.lastDirection > 0 ) {
+      if ( this.lastDirection >= 0 ) {
         amountLeftOver = widthToScroll - ( amountScolled % widthToScroll );
-      } else if ( this.lastDirection < 0 ) {
-        amountLeftOver = -(widthToScroll - ( amountScolled % widthToScroll ));
       } else {
-        return;
+        amountLeftOver = -(widthToScroll - ( amountScolled % widthToScroll ));
       }
 
       // var amountLeftOver = amountScolled % widthToScroll;
@@ -229,13 +224,11 @@ class Carousel extends Component {
         callback: this.checkIfAllTheWayOver,
         context: this
       });
-    } else {
-      this.draggingCarousel = false;
-      this.lastX, this.initialX = null
     }
 
 
-
+    this.draggingCarousel = false;
+    this.lastX, this.initialX = null
   }
 
   moving = (e) => {
