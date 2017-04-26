@@ -1498,6 +1498,14 @@ button {
 -test out again and see it works
 
 
+so now we have a pretty nice carousel. you can pick and choose what features to implement.
+i am going to put the code up on github
+
+
+
+
+
+
 now we can try and do something more challenging. we can try nad have the carousel
 get dragged.
 
